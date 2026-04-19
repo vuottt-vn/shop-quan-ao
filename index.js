@@ -18,17 +18,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // In-memory data stores (would be replaced by database in production)
 let products = [
-    { id: 1, name: 'T-Shirt Basic', price: 15.99, category: 'tops', stock: 50 },
-    { id: 2, name: 'Jeans Casual', price: 39.99, category: 'bottoms', stock: 30 },
-    { id: 3, name: 'Summer Dress', price: 29.99, category: 'dresses', stock: 25 },
-    { id: 4, name: 'Winter Jacket', price: 59.99, category: 'outerwear', stock: 15 },
-    { id: 5, name: 'Sport Shorts', price: 19.99, category: 'bottoms', stock: 40 }
+    { id: 1, name: 'Áo Dài Vải Lụa Truyền Thống', price: 450000, category: 'áo_dài', stock: 50, description: 'Áo dài truyền thống vải lụa cao cấp, thêu tay họa tiết hoa sen', colors: ['đỏ', 'xanh', 'trắng', 'vàng'] },
+    { id: 2, name: 'Áo Dài Lụa Gấm Cổ Điển', price: 550000, category: 'áo_dài', stock: 30, description: 'Áo dài vải lụa gấm sang trọng, phù hợp sự kiện trang trọng', colors: ['đen', 'đỏ', 'xanh rêu'] },
+    { id: 3, name: 'Áo Dài Lụa Tơ Tằm Cưới Hỏi', price: 850000, category: 'áo_dài', stock: 20, description: 'Áo dài cưới vải lụa tơ tằm cao cấp, đính kết tinh xảo', colors: ['đỏ', 'vàng', 'trắng'] },
+    { id: 4, name: 'Áo Dài Lụa Mùa Xuân', price: 390000, category: 'áo_dài', stock: 40, description: 'Áo dài lụa nhẹ nhàng, họa tiết hoa lá mùa xuân', colors: ['hồng', 'tím', 'trắng'] },
+    { id: 5, name: 'Áo Dài Lụa Công Sở', price: 420000, category: 'áo_dài', stock: 35, description: 'Áo dài vải lụa thanh lịch, phù hợp môi trường công sở', colors: ['xanh navy', 'đen', 'xám'] },
+    { id: 6, name: 'Áo Dài Lụa Dạo Phố', price: 380000, category: 'áo_dài', stock: 45, description: 'Áo dài lụa mềm mại, thiết kế dạo phố thời trang', colors: ['trắng', 'be', 'hồng phấn'] },
+    { id: 7, name: 'Áo Dài Lụa Tết Nguyên Đán', price: 750000, category: 'áo_dài', stock: 25, description: 'Áo dài vải lụa đỏ may mắn, họa tiết truyền thống ngày tết', colors: ['đỏ', 'vàng', 'đỏ đô'] },
+    { id: 8, name: 'Áo Dài Lụa Cô Ba Sài Gòn', price: 650000, category: 'áo_dài', stock: 15, description: 'Áo dài lụa kiểu cổ điển, phong cách cô Ba Sài Gòn', colors: ['xanh coban', 'đỏ', 'trắng'] }
 ];
 
 let orders = [];
 let customers = [];
 let nextId = {
-    product: 6,
+    product: 9,
     order: 1,
     customer: 1
 };
@@ -58,6 +61,32 @@ app.get('/api/products', (req, res) => {
     }
 
     res.json(filteredProducts);
+});
+
+// Special endpoint for chatbot to get available colors for a product
+app.get('/api/products/:id/colors', (req, res) => {
+    const product = products.find(p => p.id === parseInt(req.params.id));
+    if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ colors: product.colors });
+});
+
+// Special endpoint for chatbot to get sample order info prompts
+app.get('/api/chatbot/prompts', (req, res) => {
+    res.json({
+        collect_order_info: {
+            purpose: "Thu thập thông tin để chốt đơn hàng cho cửa hàng bán Áo Dài Vải Lụa",
+            required_fields: ["phone", "address", "color", "amount"],
+            missing_size_response: "Dạ chị thường mặc váy, đầm size gì để em lên đơn cho chị ạ!",
+            missing_color_response: "Chị lấy màu gì em lên đơn cho mình ạ?",
+            missing_phone_response: "Chị cho em xin sđt ạ",
+            missing_amount_response: "Dạ, chị lấy mấy chiếc để em báo kho lên đơn ạ",
+            missing_address_response: "Dạ, chị cho em xin thêm địa chỉ nhận hàng của mình để em lên đơn nha chị",
+            invalid_phone_response: "Số điện thoại bị sai ạ, Chị kiểm tra lại giúp em để em lên đơn cho mình ạ",
+            missing_address_detail_response: "Chị cho em xin địa chỉ cụ thể (trước khi sáp nhập) em lên đơn cho mình ạ"
+        }
+    });
 });
 
 app.get('/api/products/:id', (req, res) => {
