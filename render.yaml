@@ -1,0 +1,9 @@
+services:
+  - name: shop-quan-ao
+    type: web
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
